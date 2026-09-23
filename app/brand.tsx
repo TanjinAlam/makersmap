@@ -1,0 +1,24 @@
+// The MakersMap mark: a citron disc, an orbit broken by two nodes, and a pin
+// at the centre. Drawn as vectors so it stays sharp at every size.
+export function BrandMark({ size = 39, className = "brand-mark" }: { size?: number; className?: string }) {
+  return (
+    <span className={className} style={{ width: size, height: size }} aria-hidden="true">
+      <svg viewBox="0 0 100 100" width={size} height={size} role="img">
+        <circle cx="50" cy="50" r="50" fill="#d4ee76" />
+        <g fill="none" stroke="#1d2a20" strokeWidth="7" strokeLinecap="round">
+          {/* Two arcs, each leaving its node clockwise and covering a third of the orbit. */}
+          <path d="M 66.5 21.4 A 33 33 0 0 1 66.5 78.6" />
+          <path d="M 33.5 78.6 A 33 33 0 0 1 33.5 21.4" />
+        </g>
+        <circle cx="66.5" cy="21.4" r="7" fill="#d4ee76" stroke="#1d2a20" strokeWidth="7" />
+        <circle cx="33.5" cy="78.6" r="7" fill="#d4ee76" stroke="#1d2a20" strokeWidth="7" />
+        {/* The pin. */}
+        <path d="M 50 33 C 41.5 33 35.5 39.5 35.5 47.5 C 35.5 57.5 50 71 50 71 C 50 71 64.5 57.5 64.5 47.5 C 64.5 39.5 58.5 33 50 33 Z" fill="#1d2a20" />
+        <circle cx="50" cy="47.5" r="5.2" fill="#d4ee76" />
+      </svg>
+    </span>
+  );
+}
+
+/** The same mark as a standalone SVG document, for favicons and share images. */
+export const brandMarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#d4ee76"/><g fill="none" stroke="#1d2a20" stroke-width="7" stroke-linecap="round"><path d="M 66.5 21.4 A 33 33 0 0 1 66.5 78.6"/><path d="M 33.5 78.6 A 33 33 0 0 1 33.5 21.4"/></g><circle cx="66.5" cy="21.4" r="7" fill="#d4ee76" stroke="#1d2a20" stroke-width="7"/><circle cx="33.5" cy="78.6" r="7" fill="#d4ee76" stroke="#1d2a20" stroke-width="7"/><path d="M 50 33 C 41.5 33 35.5 39.5 35.5 47.5 C 35.5 57.5 50 71 50 71 C 50 71 64.5 57.5 64.5 47.5 C 64.5 39.5 58.5 33 50 33 Z" fill="#1d2a20"/><circle cx="50" cy="47.5" r="5.2" fill="#d4ee76"/></svg>`;
