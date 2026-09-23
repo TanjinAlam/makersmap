@@ -14,11 +14,11 @@ A city-level atlas of makers, founders, designers, and developers. People appear
 
 ![Maker cards](docs/screenshots/people.png)
 
-**Ask the atlas.** Natural-language search over the roster: "founders in Lisbon up for coffee this week" zooms the map and explains why each match fits.
+**Ask the atlas.** Natural-language search over the roster: "founders in Warsaw who want to meet for lunch" zooms the map and explains why each match fits.
 
 ![Ask the atlas results](docs/screenshots/ask.png)
 
-**Profiles built from one post.** The intro post is pinned, and the role, city, local time, what they're building, what they're looking for, and what they can help with come from the post and the X bio. Owners claim the pin with Sign in with X and then control every word.
+**Profiles built from one post.** The intro post is pinned (this one is [@dotnafis](https://x.com/dotnafis/status/2101745412201738407), the maintainer), and the role, city, local time, what they're building, what they're looking for, and what they can help with come from the post and the X bio. Owners claim the pin with Sign in with X and then control every word.
 
 ![A maker profile](docs/screenshots/profile.png)
 
