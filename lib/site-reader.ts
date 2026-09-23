@@ -10,7 +10,7 @@ type Cached = { _id: string; info: SiteInfo | null; at: number };
 const TTL = 30 * 24 * 60 * 60 * 1000;
 const UA = "Mozilla/5.0 (compatible; MakersMap/1.0; +https://makersmap.com)";
 
-const BLOCKED_HOSTS = /(^|\.)(x\.com|twitter\.com|t\.co|linkedin\.com|instagram\.com|facebook\.com|youtube\.com|youtu\.be|tiktok\.com|threads\.net|bsky\.app|medium\.com|substack\.com|github\.com|producthunt\.com|linktr\.ee|bio\.link|calendly\.com|discord\.gg|discord\.com|t\.me|wa\.me|apps\.apple\.com|play\.google\.com)$/i;
+const BLOCKED_HOSTS = /(^|\.)(x\.com|twitter\.com|t\.co|linkedin\.com|instagram\.com|facebook\.com|youtube\.com|youtu\.be|tiktok\.com|threads\.net|bsky\.app|medium\.com|substack\.com|github\.com|producthunt\.com|linktr\.ee|bio\.link|makermap\.lol|indiehackers\.com|peerlist\.io|read\.cv|calendly\.com|discord\.gg|discord\.com|t\.me|wa\.me|apps\.apple\.com|play\.google\.com)$/i;
 
 /** True when the link is a product's own site rather than a social profile or a store page. */
 export function isProductSite(url: string): boolean {
@@ -102,10 +102,10 @@ export async function readSite(url: string): Promise<SiteInfo | null> {
 }
 
 const SummarySchema = z.object({ name: z.string(), pitch: z.string(), summary: z.string(), isProduct: z.boolean() });
-const SYSTEM = `You describe a maker's project for a community atlas, from the project's own website.
+const SYSTEM = `You describe a maker's project in plain words, using only what the project's own website says.
 "name": the product's actual name exactly as the site itself uses it (from its title, logo text, or site name), with the site's capitalisation. Never a handle, a URL, or the maker's name. If the site clearly names the product differently from the label given, use the site's name.
 "pitch": one line, under 70 characters, that anyone would understand with no context: what it is, for whom. Plain words, no jargon, no adjectives like "revolutionary".
-"summary": one or two plain sentences, under 200 characters, saying what the product does and for whom, in neutral words a stranger would trust. No marketing adjectives, no exclamation marks, no emojis. If the site text is thin, use what is there and stay honest; never invent features.
+"summary": one or two plain sentences, under 200 characters, saying what the product does and for whom, in neutral words a stranger would trust. No marketing adjectives, no exclamation marks, no emojis. If the site text is thin, use what is there and stay honest; never invent features. If the page text, title, and description say nothing concrete about what the product does (a loading screen, a redirect, a bare app shell), set "isProduct" to false rather than guessing.
 "isProduct": true for anything a person could plausibly call their project: a product, an app, a service business, an agency or studio, a consultancy, a newsletter, a community, a course, a portfolio of their own work, an open-source tool. False only when the page is not a project at all: a parked domain, a generic error page, a login wall with nothing on it, someone else's social profile, an app store listing, a link-in-bio page.`;
 
 /** A summary written from the site itself. Null when the site isn't readable or isn't a product. */

@@ -2,15 +2,45 @@
 
 A city-level atlas of makers, founders, designers, and developers. People appear on the map from two sources: they add themselves, or they posted a public introduction on X ("I'm 29. Solo founder from Brazil, based in Barcelona. Looking to connect with…") and the importer listed them from that one post. Every pin is a real person; there is no sample data.
 
-**What it does**
+![The atlas: a world map with clustered maker pins](docs/screenshots/map.png)
 
-- An interactive world map (MapLibre) with clustering, country and city selection, and a list of everyone in the selected place.
-- Full profiles built from the intro post and the X bio: role, city, what they're building, what they're looking for, and the post itself, pinned. Owners claim their pin with Sign in with X and then control every word.
-- Projects with a real website only. The site is read and the name, one-line pitch, summary, and logo come from the page itself; links are re-checked weekly.
-- Leaderboard by country and city, city pages with "new this week" and "up for coffee", share cards for pins, matches, cities, and countries.
-- Ask the atlas: natural-language search over the roster, and AI-written match intros on each profile.
+## A tour
+
+**The atlas.** A MapLibre world map with clustering. Click a country or a cluster and everyone in that place is listed right under the map, with "Open to meet" and "Open to connect" badges. Open a profile and come back to the same spot on the map.
+
+![Everyone in a place, listed under the map](docs/screenshots/place.png)
+
+**Meet someone interesting.** Cards for every maker, filtered by role group (Founders, Developers, Designers, Creators, Business), by what they're looking for, and by who is nearby. More load as you scroll.
+
+![Maker cards](docs/screenshots/people.png)
+
+**Ask the atlas.** Natural-language search over the roster: "founders in Lisbon up for coffee this week" zooms the map and explains why each match fits.
+
+![Ask the atlas results](docs/screenshots/ask.png)
+
+**Profiles built from one post.** The intro post is pinned, and the role, city, local time, what they're building, what they're looking for, and what they can help with come from the post and the X bio. Owners claim the pin with Sign in with X and then control every word.
+
+![A maker profile](docs/screenshots/profile.png)
+
+**Projects with a real website.** A project is listed only when it has a site we can visit (never an X post or a social profile). The name, one-line pitch, and summary are written from the site itself, links are re-checked weekly, and the Visit button goes straight to the site.
+
+![The project catalogue](docs/screenshots/projects.png)
+
+**Leaderboard and city pages.** Countries and cities ranked by makers, with role breakdowns, "new this week", and "up for coffee".
+
+![Leaderboard](docs/screenshots/leaderboard.png)
+
+![A city page](docs/screenshots/city.png)
+
+**Share cards.** A downloadable card for every pin, match, city, and country, with a ready-to-post caption.
+
+![A share card](docs/screenshots/share.png)
+
+**Also in the box**
+
 - An admin console for the importer, the review queue, and outreach (replies under intro posts from a connected X account, capped per day).
 - Weekly "who looked at your pin" emails with a one-click unsubscribe.
+- A public API in three tiers so the map stays fast: dots, cards for what's on screen, and rows per place.
 
 ## Stack
 
