@@ -5414,6 +5414,11 @@ a.public-profile-hello {
 
 .doc-card ul {
   padding-left: 20px;
+  list-style: disc;
+}
+
+.doc-card li + li {
+  margin-top: 6px;
 }
 
 .doc-links {
