@@ -1,15 +1,18 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import vinext from "vinext";
-import { defineConfig } from "vite";
-import hostingConfig from "./.openai/hosting.json";
+import { defineConfig, type Plugin } from "vite";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
 
-const { d1, r2 } = hostingConfig;
+// .openai/ is checkout-local and gitignored, so a fresh clone has no hosting.json.
+const hostingConfigUrl = new URL("./.openai/hosting.json", import.meta.url);
+const { d1, r2 }: { d1?: string; r2?: string } = existsSync(hostingConfigUrl)
+  ? JSON.parse(readFileSync(hostingConfigUrl, "utf8"))
+  : {};
 
 // macOS Seatbelt blocks FSEvents, so Codex previews need polling for HMR.
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
@@ -49,6 +52,28 @@ function resolvePunycodeForOptimizer() {
     },
   };
 }
+// MapLibre starts its worker from `new URL("./maplibre-gl-worker.mjs", import.meta.url)`
+// built at runtime, so the bundler never sees it. In a production build the map
+// code lands in _next/static/chunks/ and the worker 404s, leaving an empty globe.
+// Emit the worker (and the shared module it imports) next to the chunks.
+function emitMaplibreWorker(): Plugin {
+  const require = createRequire(import.meta.url);
+  return {
+    name: "emit-maplibre-worker",
+    apply: "build",
+    applyToEnvironment: (environment) => environment.name === "client",
+    generateBundle() {
+      for (const file of ["maplibre-gl-worker.mjs", "maplibre-gl-shared.mjs"]) {
+        this.emitFile({
+          type: "asset",
+          fileName: `_next/static/chunks/${file}`,
+          source: readFileSync(require.resolve(`maplibre-gl/dist/${file}`), "utf8"),
+        });
+      }
+    },
+  };
+}
+
 const optimizerOptions = { rolldownOptions: { plugins: [resolvePunycodeForOptimizer()] } };
 
 function loadLocalEnv() {
@@ -148,6 +173,7 @@ export default defineConfig(async () => {
     },
     plugins: [
       fixPunycodeSlash(),
+      emitMaplibreWorker(),
       vinext(),
       sites({ mockAuth: !managedLinux }),
       cloudflare({
