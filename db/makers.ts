@@ -42,11 +42,34 @@ export async function countPublicWhere(filter: Record<string, unknown>): Promise
   return withDb((db) => collection(db).countDocuments({ hidden: { $ne: true }, ...filter }));
 }
 
+// Most pages read the whole atlas. Without this every overlapping request held
+// its own copy, and a single long-lived isolate (self-hosted workerd) ran out of
+// heap under a burst. Only the settled list is shared, never a pending promise:
+// Workers can't resolve one request's I/O from another. While one request
+// refreshes an expired list, the others keep serving the previous one.
+// Callers copy before changing anything (filter/map). The atlas is already
+// public-cached for 60s.
+const LIST_TTL_MS = 30_000;
+let listed: { at: number; makers: Maker[] } | null = null;
+let refreshing = false;
+
+function forgetListedMakers(): void {
+  listed = null;
+}
+
 export async function listMakers(): Promise<Maker[]> {
-  return withDb(async (db) => {
-    const docs = await collection(db).find().sort({ id: 1 }).toArray();
-    return docs.map(toMaker);
-  });
+  if (listed && (refreshing || Date.now() - listed.at < LIST_TTL_MS)) return listed.makers;
+  refreshing = true;
+  try {
+    const makers = await withDb(async (db) => {
+      const docs = await collection(db).find().sort({ id: 1 }).toArray();
+      return docs.map(toMaker);
+    });
+    listed = { at: Date.now(), makers };
+    return makers;
+  } finally {
+    refreshing = false;
+  }
 }
 
 export async function getMakerById(id: number): Promise<Maker | null> {
@@ -63,6 +86,7 @@ export async function createMaker(input: Maker): Promise<Maker> {
       throw new Error(`A maker with id ${input.id} already exists.`);
     }
     await collection(db).insertOne({ ...input });
+    forgetListedMakers();
     return input;
   });
 }
@@ -121,6 +145,7 @@ export async function upsertClaimedMaker(input: Maker, previousId?: number): Pro
       if (previousId === existingByHandle.id || (!existingByHandle.claimed && existingByHandle.source === "self")) {
         const next = normalizeMaker({ ...claimed, ...keepListing(existingByHandle, claimed), id: existingByHandle.id, claimed: true, source: "self" });
         await makers.updateOne({ id: existingByHandle.id }, { $set: { ...next } });
+        forgetListedMakers();
         return next;
       }
       throw new Error(`@${handle} is already taken.`);
@@ -129,11 +154,13 @@ export async function upsertClaimedMaker(input: Maker, previousId?: number): Pro
     if (existingById) {
       const next = normalizeMaker({ ...claimed, ...keepListing(existingById, claimed), id: existingById.id, claimed: true, source: "self" });
       await makers.updateOne({ id: existingById.id }, { $set: { ...next } });
+      forgetListedMakers();
       return next;
     }
 
     const next = normalizeMaker({ ...claimed, id: await nextIdIn(db), claimed: true, source: "self" });
     await makers.insertOne({ ...next });
+    forgetListedMakers();
     return next;
   });
 }
@@ -158,6 +185,7 @@ export async function upsertListedMaker(input: Maker): Promise<{ maker: Maker; c
       if (raced) return { maker: toMaker(raced), created: false };
       throw error;
     }
+    forgetListedMakers();
     return { maker: input, created: true };
   });
 }
@@ -174,6 +202,7 @@ export async function seedMakers(seed: Maker[]): Promise<{ inserted: number; ski
     }
     if (seed.length > 0) {
       await collection(db).insertMany(seed.map((maker) => ({ ...maker })));
+      forgetListedMakers();
     }
     return { inserted: seed.length, skipped: false };
   });
