@@ -1,4 +1,8 @@
 FROM node:24-bookworm-slim
+# workerd verifies TLS against the system CA store (Node ships its own), and the
+# slim image has none, so every outbound fetch (X avatars, LLM, email) would fail.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
