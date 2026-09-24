@@ -7,10 +7,19 @@ export const DEFAULT_TITLE = "MakersMap — A world of good company";
 export const DEFAULT_DESCRIPTION =
   "A city-level atlas of makers. See what someone is building, and why you should say hello.";
 
+/** The social preview shown when a MakersMap link is shared on X, Facebook, LinkedIn, Slack, iMessage. */
+export const OG_IMAGE = {
+  url: "/og.jpg",
+  width: 1200,
+  height: 630,
+  alt: "MakersMap: find your people, build together. A globe with founders, makers and builders pinned by city.",
+  type: "image/jpeg",
+};
+
 export function siteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL;
   if (fromEnv) return fromEnv.replace(/\/$/, "");
-  return "https://makersmap.com";
+  return "https://makersmap.net";
 }
 
 export function absoluteUrl(path = "/"): string {
@@ -51,11 +60,13 @@ export function pageMetadata({
       siteName: SITE_NAME,
       title: metaTitle,
       description: metaDescription,
+      images: [OG_IMAGE],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: metaTitle,
       description: metaDescription,
+      images: [OG_IMAGE.url],
     },
   };
 }

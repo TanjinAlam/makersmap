@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { JsonLd } from "./json-ld";
 import { SiteFooter } from "./site-footer";
 import { readEnv } from "@/db";
-import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_NAME, siteUrl, websiteJsonLd } from "@/lib/seo";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, OG_IMAGE, SITE_NAME, siteUrl, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 import "./globe.css";
+import { DataFastAnalytics } from "@/app/analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -24,15 +25,18 @@ export const metadata: Metadata = {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     url: siteUrl(),
+    images: [OG_IMAGE],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/icon-512.png", sizes: "512x512", type: "image/png" }],
     shortcut: "/favicon.svg",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
@@ -47,6 +51,7 @@ export default function RootLayout({
         <JsonLd data={websiteJsonLd()} />
         {children}
         <SiteFooter />
+        {readEnv("DATAFAST_WEBSITE_ID") && <DataFastAnalytics websiteId={readEnv("DATAFAST_WEBSITE_ID")!} />}
         {readEnv("PLAUSIBLE_DOMAIN") && (
           <script defer data-domain={readEnv("PLAUSIBLE_DOMAIN")} src="https://plausible.io/js/script.js" />
         )}

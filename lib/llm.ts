@@ -42,7 +42,7 @@ async function viaOpenRouter<T extends z.ZodTypeAny>(ask: Ask<T>, attempt = 0): 
     headers: {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": readEnv("SITE_URL") || "https://makersmap.com",
+      "HTTP-Referer": readEnv("SITE_URL") || "https://makersmap.net",
       "X-Title": "MakersMap",
     },
     body: JSON.stringify({

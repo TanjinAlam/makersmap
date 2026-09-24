@@ -62,7 +62,7 @@ export function CardClient({ handle, maker }: { handle: string; maker: CardMaker
             {maker.lookingFor.length > 0 && (
               <div className="share-card-looking"><span>Looking for</span>{maker.lookingFor.map((item) => <em key={item}>{item}</em>)}</div>
             )}
-            <p className="share-card-url">makersmap.com/m/{handle}</p>
+            <p className="share-card-url">makersmap.net/m/{handle}</p>
           </div>
         </div>
       </div>

@@ -104,6 +104,7 @@ const localBindingConfig = {
     EMAIL_FROM: process.env.EMAIL_FROM || "",
     SITE_URL: process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "",
     PLAUSIBLE_DOMAIN: process.env.PLAUSIBLE_DOMAIN || "",
+    DATAFAST_WEBSITE_ID: process.env.DATAFAST_WEBSITE_ID || "",
     ...(process.env.NODE_ENV === "production" && !process.env.INLINE_SECRETS ? {} : {
       MONGODB_URI: process.env.MONGODB_URI || "",
       X_BEARER_TOKEN: process.env.X_BEARER_TOKEN || "",

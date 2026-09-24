@@ -15,7 +15,7 @@ export type ShareData = {
   faces: Face[];           // up to five
   stat?: { value: string; label: string };
   accent: string;
-  path: string;            // makersmap.com/…
+  path: string;            // makersmap.net/…
   postText: string;        // what to post with it
   fileName: string;
 };
@@ -67,7 +67,7 @@ export function ShareClient({ data }: { data: ShareData }) {
             <h1>{data.title}</h1>
             {data.subtitle && <p className="share-card-handle">{data.subtitle}</p>}
             {data.lines.map((line) => <p key={line} className="share-card-place">{line}</p>)}
-            <p className="share-card-url">makersmap.com{data.path}</p>
+            <p className="share-card-url">makersmap.net{data.path}</p>
           </div>
         </div>
       </div>

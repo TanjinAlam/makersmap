@@ -15,6 +15,7 @@ declare namespace Cloudflare {
     X_CLIENT_SECRET?: string;
     SITE_URL?: string;
     PLAUSIBLE_DOMAIN?: string;
+    DATAFAST_WEBSITE_ID?: string;
     BUCKET?: R2Bucket;
   }
 }
