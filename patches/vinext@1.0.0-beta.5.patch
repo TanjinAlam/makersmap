@@ -1,0 +1,66 @@
+diff --git a/dist/shims/link.js b/dist/shims/link.js
+index aed7faa777804ce9f02891516144c9a049c5217e..a2bba03ea15748df5276fe9e5012d37571dc2890 100644
+--- a/dist/shims/link.js
++++ b/dist/shims/link.js
+@@ -19,6 +19,15 @@ import { canAutoPrefetchFullAppRoute, resolveAutoAppRoutePrefetch, resolveFullAp
+ import { clearLinkForCurrentNavigation, notifyLinkNavigationStart, setLinkForCurrentNavigation } from "./internal/link-status-registry.js";
+ import React, { createContext, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
+ import { jsx } from "react/jsx-runtime";
++// Static namespace imports: rolldown merges these modules into a shared chunk and
++// the lazy import() then resolves to that chunk's minified exports, so
++// navigateClientSide / createRscRequestUrl were undefined (every <Link> click threw).
++import * as navigationModuleNamespace from "./navigation.js";
++import * as rscCacheBustingNamespace from "../server/app-rsc-cache-busting.js";
++import * as appElementsNamespace from "../server/app-elements.js";
++import * as rscRenderModeNamespace from "../server/app-rsc-render-mode.js";
++import * as headersNamespace from "../server/headers.js";
++import * as hybridClientRouteOwnerNamespace from "./internal/hybrid-client-route-owner.js";
+ //#region src/shims/link.tsx
+ /**
+ * next/link shim
+@@ -29,18 +38,14 @@ import { jsx } from "react/jsx-runtime";
+ */
+ const HAS_PAGES_ROUTER = process.env.__VINEXT_HAS_PAGES_ROUTER !== "false";
+ const HAS_CLIENT_REWRITES = process.env.__VINEXT_HAS_CLIENT_REWRITES !== "false";
+-let loadedNavigationModule = null;
+-let navigationModulePromise = null;
++let loadedNavigationModule = navigationModuleNamespace;
+ let loadedHybridClientRouteOwnerModule = null;
+ let hybridClientRouteOwnerModulePromise = null;
+ function loadNavigationModule() {
+-	return navigationModulePromise ??= import("./navigation.js").then((module) => {
+-		loadedNavigationModule = module;
+-		return module;
+-	});
++	return Promise.resolve(navigationModuleNamespace);
+ }
+ function loadHybridClientRouteOwnerModule() {
+-	return hybridClientRouteOwnerModulePromise ??= import("./internal/hybrid-client-route-owner.js").then((module) => {
++	return hybridClientRouteOwnerModulePromise ??= Promise.resolve(hybridClientRouteOwnerNamespace).then((module) => {
+ 		loadedHybridClientRouteOwnerModule = module;
+ 		return module;
+ 	});
+@@ -184,10 +189,10 @@ function prefetchUrl(href, mode, priority = "low", pagesRouteHref, locale) {
+ 				if (isBotUserAgent(window.navigator?.userAgent ?? "")) return;
+ 				const [navigation, { AppElementsWire }, rscCacheBusting, { APP_RSC_RENDER_MODE_PREFETCH_DYNAMIC_SHELL, APP_RSC_RENDER_MODE_PREFETCH_LOADING_SHELL }, headersModule, hybridRouteOwner] = await Promise.all([
+ 					loadNavigationModule(),
+-					import("../server/app-elements.js"),
+-					import("../server/app-rsc-cache-busting.js"),
+-					import("../server/app-rsc-render-mode.js"),
+-					import("../server/headers.js"),
++					Promise.resolve(appElementsNamespace),
++					Promise.resolve(rscCacheBustingNamespace),
++					Promise.resolve(rscRenderModeNamespace),
++					Promise.resolve(headersNamespace),
+ 					HAS_PAGES_ROUTER || HAS_CLIENT_REWRITES ? loadHybridClientRouteOwnerModule() : null
+ 				]);
+ 				if (navigationEpoch !== linkPrefetchNavigationEpoch) return;
+@@ -382,7 +387,7 @@ function prefetchUrl(href, mode, priority = "low", pagesRouteHref, locale) {
+ async function promotePrefetchEntriesForNavigation(href) {
+ 	if (typeof window === "undefined") return;
+ 	if (!hasAppNavigationRuntime()) return;
+-	const [{ getPrefetchCache }, { stripRscCacheBustingSearchParam, stripRscSuffix }] = await Promise.all([loadNavigationModule(), import("../server/app-rsc-cache-busting.js")]);
++	const [{ getPrefetchCache }, { stripRscCacheBustingSearchParam, stripRscSuffix }] = await Promise.all([loadNavigationModule(), Promise.resolve(rscCacheBustingNamespace)]);
+ 	let target;
+ 	try {
+ 		target = new URL(toBrowserNavigationHref(href, window.location.href, __basePath), window.location.href);
